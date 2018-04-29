@@ -19,7 +19,7 @@ var sendMailAction  = require('./lib/sendmail').sendMailAction,
 program
   .version('0.1.2')
   .usage('[options]')
-  .option('-h, --elhost [value]', 'Elasticsearch host. Default: 192.168.130.59')
+  .option('-h, --elhost [value]', 'Elasticsearch host. Default: 127.0.0.1')
   .option('-p, --elport [value]', 'Elasticsearch port. Default: 9200')
   .option('--index [value]', 'Index pattern. Default: collectd-YYYY.MM.dd')
   .option('-u, --query-unit [value]', 'Unit use for threshold, accept bit / kbit / mbit / byte / count. Default: count')
