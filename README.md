@@ -70,3 +70,11 @@ function dailyPat() {
 
 module.exports = config
 ```
+
+<br>
+
+### TODOs
+* Fix some bugs
+* Seperate the mail template from main code
+* Add parameter which can point to different config file
+* Remove `dailyPat()` function from config file (put into somewhere else)
