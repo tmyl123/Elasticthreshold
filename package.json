@@ -1,0 +1,34 @@
+{
+  "name": "eq",
+  "version": "1.0.0",
+  "description": "Simple tool to check threshhold from elasticsearch",
+  "main": "eq.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "colors": "^1.2.1",
+    "commander": "^2.15.1",
+    "nodemailer": "^4.6.4",
+    "request": "^2.85.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thomas12345679/eq.git"
+  },
+  "keywords": [
+    "elasticsearch",
+    "threshhold",
+    "query"
+  ],
+  "author": "tommy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thomas12345679/eq/issues"
+  },
+  "homepage": "https://github.com/thomas12345679/eq#readme"
+}
