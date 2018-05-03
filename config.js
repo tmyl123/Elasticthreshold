@@ -1,21 +1,21 @@
 var config = {}
 
-config.elhost        = "127.0.0.1",
+config.elhost        = "10.10.80.25",
 config.elport        = "9200", //if you have index pattern, you can use YYYY-MM-dd
-config.index         = "test-index", //agg field, if your query is text, and you don't car about agg, you can omit this
-config.field         = "value",
-config.isCounter     = false, 
+config.index         = "pa001-2018.05.03", 
+config.field         = "value", //agg field, if your query is text, and you don't care about agg, you can omit this
+//config.isCounter     = false, 
 config.queryUnit     = "count"
-config.rawUnit       = "byte", //how many time per buckets, this value usually same as rawInterval
-config.timeframe     = "1m", //if your data have polling interval, put interval here, otherwise put 1
-config.rawInterval   = 1,  // 5, 5bit/s, 5mbit/s
-config.threshhold    = "2",  //available: ">" "==" "!==" "<"
-config.op            = ">",  //available: "dir" "raw"
-config.compareMode   = "hit",
+config.rawUnit       = "byte", 
+config.timeframe     = "1m",   //how many time per buckets, this value usually same as rawInterval
+config.rawInterval   = 1,      //if your data have polling interval, put interval here, otherwise put 1
+config.threshold    = "2",  // 5, 5bit/s, 5mbit/s
+config.op            = ">",  //available: ">" "==" "!==" "<"
+config.compareMode   = "hit",//available: "dir" "raw"
 config.singleMode    = false,
 config.exitMode      = false,
 config.onlyMet       = false,
-config.sendMail      = true,
+config.sendMail      = false,
 config.mailService   = "gmail"
 config.mailAuth      = {
   user: "<your gmail username>",

@@ -14,7 +14,7 @@ var config = require('./config')
 var sendMailAction  = require('./lib/sendmail').sendMailAction,
     changeUnit      = require('./lib/changeunit').changeUnit,
     parseTimeframe  = require('./lib/parsetimeframe').parseTimeframe,
-    parseThreshhold = require('./lib/parsethreshold').parseThreshhold
+    parseThreshold = require('./lib/parsethreshold').parseThreshold
 
 program
   .version('0.1.2')
@@ -115,7 +115,7 @@ var elhost      = program.elhost        || config.elhost,
     rawunit     = program.rawUnit       || config.rawUnit,
     timeframe   = parseTimeframe(config.timeframe),
     rawinterval = program.rawInterval   || config.rawInterval,
-    threshold  = parseThreshhold(config.threshold)
+    threshold  = parseThreshold(config.threshold)
     qthreshold = threshold.thresholdval / threshold.timesecond,
     op          = program.op            || config.op,
     comparemode = program.compareMode   || config.compareMode,
