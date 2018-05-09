@@ -5,16 +5,17 @@
 //
 //===================================//
 
-var program = require("commander"),
-    request = require("request"),
-    colors  = require('colors')
+var program = require('commander'),
+    request = require('request'),
+    colors  = require('colors'),
+    path    = require('path')
 
 
 var sendMailAction  = require('./lib/sendmail').sendMailAction,
     changeUnit      = require('./lib/changeunit').changeUnit,
     parseTimeframe  = require('./lib/parsetimeframe').parseTimeframe,
     parseThreshold  = require('./lib/parsethreshold').parseThreshold,
-		parseDatepat    = require("./lib/parsedatepattern.js").parseDatepat
+    parseDatepat    = require("./lib/parsedatepattern.js").parseDatepat
 
 program
   .version('0.1.2')
@@ -71,11 +72,14 @@ var operators = {
 //var config = require('./config')
 
 // config goes here
-var config      = require(program.config)
-    elhost      = program.elhost        || config.elhost,
+var configpath = path.join(process.cwd(), program.config)
+var config     = require(configpath)
+
+
+var elhost      = program.elhost        || config.elhost,
     elport      = program.elport        || config.elport,
     index       = program.index         || config.index, 
-		datefield   = program.datefield     || config.datefield,
+    datefield   = program.datefield     || config.datefield,
     qfield      = program.field         || config.field,
     iscounter   = program.isCounter     || config.isCounter,
     queryunit   = program.queryUnit     || config.queryUnit,
@@ -88,8 +92,8 @@ var config      = require(program.config)
     comparemode = program.compareMode   || config.compareMode,
     onlymet     = program.onlyMet       || config.onlyMet,
     sendmail    = program.sendMail      || config.sendMail,
-		querystring = program.queryString   || config.queryString,
-		queryrange  = program.queryRange    || config.queryRange
+    querystring = program.queryString   || config.queryString,
+    queryrange  = program.queryRange    || config.queryRange
 
 
 if (config.datepat) {
