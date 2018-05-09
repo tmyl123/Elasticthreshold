@@ -23,8 +23,6 @@ Although we have Elastalert, but as far as I know, they don't provide derivative
 `threshhold` : The threshold to define an alert  
 `op` : The operator compare to each query result  
 `compareMode` : Support `hit` mode and `dir` mode  
-`singleMode` : The response will only return one value  
-`exitMode` : The program will use exit code to represent value  
 `onlyMet` : Output only when threshold is met  
 `sendMail` : If we are going to send mail or not  
 
@@ -37,7 +35,7 @@ var config = {}
 
 config.elhost        = "127.0.0.1",
 config.elport        = "9200",       
-config.index         = "test-index",  //if you have index pattern, you can use YYYY-MM-dd 
+config.index         = "myindex",  //if you have index pattern, you can use YYYY-MM-dd 
 config.field         = "value",       //agg field, if your query is text, and you don't car about agg, you can omit this
 config.isCounter     = false,
 config.queryUnit     = "count",
@@ -47,16 +45,12 @@ config.rawInterval   = 1,             //if your data have polling interval, put 
 config.threshhold    = "2",           // 5, 5bit/s, 5mbit/s
 config.op            = ">",           //available: >, ==, !==, <
 config.compareMode   = "hit",         //available: dir, raw
-config.singleMode    = false,
-config.exitMode      = false,
 config.onlyMet       = false,
 config.sendMail      = true,
-config.mailService   = "gmail"
-config.mailAuth      = {
-   user: "<your gmail username>",
-   pass: "<your gmail pass>"
- }
-
+config.mailService   = "gmail",
+config.mailUser      = "<your gmail user>",
+config.mailPass      = "<your gmail pass>",
+config.mailTo        = "<reveiver mail>"
 
  //YYYY.MM.dd
 function dailyPat() {
@@ -78,3 +72,4 @@ module.exports = config
 * Seperate the mail template from main code
 * Add parameter which can point to different config file
 * Remove `dailyPat()` function from config file (put into somewhere else)
+* Add custom agg parameter

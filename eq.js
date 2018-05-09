@@ -33,8 +33,6 @@ program
   .option('-r, --query-range [value]', '@timestamp=gt:now-2m&lt:now,value=gt:1000')
   .option('-T, --threshold [value]', 'You dont say')
   .option('-m, --compare-mode [mode]', 'Accept hit / dir. Default: hit')
-  .option('-s, --single-mode [mode]', 'If -s is set, the response will only return one value. accept hit / val')
-  .option('-e, --exit-mode', 'If -e is set, the program will use exit code to represent value. must use with -s')
   .option('-o, --only-met', 'Output only when threshold is met')
   .option('-A, --met-action', 'the action if we met the condition')
 
@@ -69,21 +67,23 @@ program.queryString.split(',').forEach(e => {
 })
 
 // making range object
-program.queryRange.split(',').forEach(e => {
-  var rangeobj = {}
-  rangeobj.range = {}
-  e.split('=').forEach(a => {
-    field = e.split('=')[0]
-    condition = e.split('=')[1]
-    rangeobj.range[field] = {}
-    condition.split("&").forEach(c => {
-      gtlt = c.split(':')[0]
-      val = c.split(':')[1]
-      rangeobj.range[field][gtlt] = val
+if (program.queryRange) {
+  program.queryRange.split(',').forEach(e => {
+    var rangeobj = {}
+    rangeobj.range = {}
+    e.split('=').forEach(a => {
+      field = e.split('=')[0]
+      condition = e.split('=')[1]
+      rangeobj.range[field] = {}
+      condition.split("&").forEach(c => {
+        gtlt = c.split(':')[0]
+        val = c.split(':')[1]
+        rangeobj.range[field][gtlt] = val
+      })
     })
+    querymust.push(rangeobj)
   })
-  querymust.push(rangeobj)
-})
+}
 
 
 
@@ -109,6 +109,7 @@ var operators = {
 var elhost      = program.elhost        || config.elhost,
     elport      = program.elport        || config.elport,
     index       = program.index         || config.index, 
+		datefield   = program.datefield     || config.datefield,
     qfield      = program.field         || config.field,
     iscounter   = program.isCounter     || config.isCounter,
     queryunit   = program.queryUnit     || config.queryUnit,
@@ -119,17 +120,14 @@ var elhost      = program.elhost        || config.elhost,
     qthreshold = threshold.thresholdval / threshold.timesecond,
     op          = program.op            || config.op,
     comparemode = program.compareMode   || config.compareMode,
-    singlemode  = program.singleMode    || config.singleMode,
-    exitmode    = program.exitMode      || config.exitMode,
     onlymet     = program.onlyMet       || config.onlyMet,
-    sendmail    = program.sendMail      || config.sendMail,
-    mailauth    = config.mailAuth
+    sendmail    = program.sendMail      || config.sendMail
 
 
 //console.log(threshold.thresholdval, threshold.thresholdunit, threshold.timesecond)
 // content post to elastic
 var postcontent = {
-  "sort":[  {"@timestamp": { "order" : "asc" }} ],
+  "sort":[  { [datefield]: { "order" : "asc" }} ],
   "query": {
     "bool": {
       "must": querymust
@@ -238,37 +236,11 @@ request.post(options,function(err, response, body){
   sumobj.hitscount = body.hits.total
   sumobj.hits = body.hits.hits
 
+				console.log(JSON.stringify(sumobj))
 
 // Output
   if (onlymet && !sumobj.ismet) {
     process.exit()
-  }
-
-  if (singlemode) {
-    switch(singlemode) {
-      case "count":
-        if (exitmode) {
-          console.log(sumobj.hitscount)
-          process.exit(sumobj.hitscount)
-        } else {
-          console.log(sumobj.hitscount)
-        }
-        break;
-      case "val":
-        if (exitmode) {
-          console.log(sumobj.lastvalue)
-          process.exit(sumobj.lastvalue)
-        } else {
-          console.log(sumobj.lastvalue)
-        }
-        break;
-      default:
-        console.log("available mode: hit / val")
-        program.outputHelp(make_blue);
-        process.exit();        
-    }
-  } else {
-    console.log(JSON.stringify(sumobj))
   }
 
   if (sumobj.ismet) {
@@ -286,7 +258,7 @@ request.post(options,function(err, response, body){
       mailbody += '索引: ' + index + '<br>'
       mailbody += '查詢字串: ' + program.queryString + '<br>'
       mailbody += '查詢範圍: ' + program.queryRange + '<br>'
-      sendMailAction(mailauth, mailbody)
+      sendMailAction(config, mailbody)
     }
   }
 
