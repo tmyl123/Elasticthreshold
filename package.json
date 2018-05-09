@@ -10,6 +10,7 @@
     "colors": "^1.2.1",
     "commander": "^2.15.1",
     "nodemailer": "^4.6.4",
+    "pug": "^2.0.3",
     "request": "^2.85.0"
   },
   "devDependencies": {},

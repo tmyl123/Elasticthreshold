@@ -50,7 +50,7 @@ config.sendMail      = true,
 config.mailService   = "gmail",
 config.mailUser      = "<your gmail user>",
 config.mailPass      = "<your gmail pass>",
-config.mailTo        = "<reveiver mail>"
+config.mailTo        = "<receiver mail>"
 
  //YYYY.MM.dd
 function dailyPat() {
@@ -69,7 +69,4 @@ module.exports = config
 
 ### TODOs
 * Fix some bugs
-* Seperate the mail template from main code
-* Add parameter which can point to different config file
-* Remove `dailyPat()` function from config file (put into somewhere else)
 * Add custom agg parameter

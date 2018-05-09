@@ -9,12 +9,12 @@ var program = require("commander"),
     request = require("request"),
     colors  = require('colors')
 
-var config = require('./config')
 
 var sendMailAction  = require('./lib/sendmail').sendMailAction,
     changeUnit      = require('./lib/changeunit').changeUnit,
     parseTimeframe  = require('./lib/parsetimeframe').parseTimeframe,
-    parseThreshold = require('./lib/parsethreshold').parseThreshold
+    parseThreshold  = require('./lib/parsethreshold').parseThreshold,
+		parseDatepat    = require("./lib/parsedatepattern.js").parseDatepat
 
 program
   .version('0.1.2')
@@ -27,7 +27,6 @@ program
   .option('-t, --timeframe [value]', 'Group time bucket per n minute. Default: 1')
   .option('-I, --raw-interval [value]', 'If your database receive data per n second, put n here. Default: 1')
   .option('--op [value]', 'Support > == !== <. Default >')
-//  .option('-c, --is-counter', 'Set this argument if your data type is counter.')
   .option('-q, --query-string [value]', 'host.keyword:Moo_Kibana01,type_instance:ens160 Default: none')
   .option('-f, --field [value]', 'The field you are interested in. Default: value')
   .option('-r, --query-range [value]', '@timestamp=gt:now-2m&lt:now,value=gt:1000')
@@ -35,6 +34,7 @@ program
   .option('-m, --compare-mode [mode]', 'Accept hit / dir. Default: hit')
   .option('-o, --only-met', 'Output only when threshold is met')
   .option('-A, --met-action', 'the action if we met the condition')
+  .option('-c, --config [value]', 'the config file to use')
 
 
 if (!process.argv.slice(2).length) {
@@ -44,47 +44,10 @@ if (!process.argv.slice(2).length) {
 
 program.on('--help', function(){
   console.log('');
-  console.log('Full Examples:');
-  console.log('');
-  console.log('eqtool -q host.keyword:Moo_Kibana01,type_instance:ens160 -r "@timestamp=gt:now-2m&lt:now,tx=gt:1000" -u mbit -U byte -T 5 -f tx -i 1 -I 1 --op ">" -m dir');
-  console.log('');
-  console.log('eqtool -q host.keyword:Moo_Kibana01,type_instance:ens160 -r "@timestamp=gt:now-2m&lt:now,tx=gt:1000" -u count -U byte -T 1 -f tx -i 1 -I 1 --op ">" -m hit');
-  console.log('');
-  console.log('--index test-index -q foo.keyword:tux -r "@timestamp=gt:now-2m&lt:now" -T 0 -f tux');
-  console.log('');
 });
 
 
 program.parse(process.argv);
-
-var querymust = []
-// making query object
-program.queryString.split(',').forEach(e => {
-  var termobj = {}
-  termobj.term = {}
-  termobj['term'][e.split(':')[0]] = e.split(':')[1]
-  querymust.push(termobj)
-})
-
-// making range object
-if (program.queryRange) {
-  program.queryRange.split(',').forEach(e => {
-    var rangeobj = {}
-    rangeobj.range = {}
-    e.split('=').forEach(a => {
-      field = e.split('=')[0]
-      condition = e.split('=')[1]
-      rangeobj.range[field] = {}
-      condition.split("&").forEach(c => {
-        gtlt = c.split(':')[0]
-        val = c.split(':')[1]
-        rangeobj.range[field][gtlt] = val
-      })
-    })
-    querymust.push(rangeobj)
-  })
-}
-
 
 
 // elastic use GMT+0
@@ -105,8 +68,11 @@ var operators = {
 };
 
 
+//var config = require('./config')
+
 // config goes here
-var elhost      = program.elhost        || config.elhost,
+var config      = require(program.config)
+    elhost      = program.elhost        || config.elhost,
     elport      = program.elport        || config.elport,
     index       = program.index         || config.index, 
 		datefield   = program.datefield     || config.datefield,
@@ -116,12 +82,49 @@ var elhost      = program.elhost        || config.elhost,
     rawunit     = program.rawUnit       || config.rawUnit,
     timeframe   = parseTimeframe(config.timeframe),
     rawinterval = program.rawInterval   || config.rawInterval,
-    threshold  = parseThreshold(config.threshold)
-    qthreshold = threshold.thresholdval / threshold.timesecond,
+    threshold   = parseThreshold(config.threshold),
+    qthreshold  = threshold.thresholdval / threshold.timesecond,
     op          = program.op            || config.op,
     comparemode = program.compareMode   || config.compareMode,
     onlymet     = program.onlyMet       || config.onlyMet,
-    sendmail    = program.sendMail      || config.sendMail
+    sendmail    = program.sendMail      || config.sendMail,
+		querystring = program.queryString   || config.queryString,
+		queryrange  = program.queryRange    || config.queryRange
+
+
+if (config.datepat) {
+  index = index + parseDatepat(config.datepat)
+  config.fullIndex = index
+}
+
+var querymust = []
+// making query object
+querystring.split(',').forEach(e => {
+  var termobj = {}
+  termobj.term = {}
+  termobj['term'][e.split(':')[0]] = e.split(':')[1]
+  querymust.push(termobj)
+})
+
+// making range object
+if (queryrange) {
+  queryrange.split(',').forEach(e => {
+    var rangeobj = {}
+    rangeobj.range = {}
+    e.split('=').forEach(a => {
+      field = e.split('=')[0]
+      condition = e.split('=')[1]
+      rangeobj.range[field] = {}
+      condition.split("&").forEach(c => {
+        gtlt = c.split(':')[0]
+        val = c.split(':')[1]
+        rangeobj.range[field][gtlt] = val
+      })
+    })
+    querymust.push(rangeobj)
+  })
+}
+
 
 
 //console.log(threshold.thresholdval, threshold.thresholdunit, threshold.timesecond)
@@ -133,7 +136,9 @@ var postcontent = {
       "must": querymust
     }
   },
-  "aggs" : {
+}
+
+var aggs = {
   "val_per_interval" : {
     "date_histogram" : {
       "field" : "@timestamp",
@@ -152,7 +157,10 @@ var postcontent = {
       }
     }
   }
-  }
+}
+
+if (config.withAggs) {
+  postcontent.aggs = aggs
 }
 
 var options = {
@@ -236,7 +244,7 @@ request.post(options,function(err, response, body){
   sumobj.hitscount = body.hits.total
   sumobj.hits = body.hits.hits
 
-				console.log(JSON.stringify(sumobj))
+	console.log(JSON.stringify(sumobj))
 
 // Output
   if (onlymet && !sumobj.ismet) {
@@ -258,7 +266,7 @@ request.post(options,function(err, response, body){
       mailbody += '索引: ' + index + '<br>'
       mailbody += '查詢字串: ' + program.queryString + '<br>'
       mailbody += '查詢範圍: ' + program.queryRange + '<br>'
-      sendMailAction(config, mailbody)
+      sendMailAction(config, sumobj)
     }
   }
 
