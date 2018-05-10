@@ -12,9 +12,10 @@ p 觸發紀錄(至多十筆):
 
 ul
   each val in data.hits
-    li= val._source.domain + ': ' + val._source.hit
+    li= val.avg_val.value + ': ' + val.val_speed.value
 
 p 完整搜尋句柄
 
-pre #{config.querySource}
+//pre #{config.querySource} 
+pre !{JSON.stringify(config.querySource, undefined, 2)}
 

@@ -31,36 +31,45 @@ Although we have Elastalert, but as far as I know, they don't provide derivative
 ### Full configuration example
 
 ```
-var config = {}
+var config       = {}
 
-config.elhost        = "127.0.0.1",
-config.elport        = "9200",       
-config.index         = "myindex",  //if you have index pattern, you can use YYYY-MM-dd 
-config.field         = "value",       //agg field, if your query is text, and you don't car about agg, you can omit this
-config.isCounter     = false,
-config.queryUnit     = "count",
-config.rawUnit       = "byte",
-config.timeframe     = "1m",          //how many time per buckets, this value usually same as rawInterval
-config.rawInterval   = 1,             //if your data have polling interval, put interval here, otherwise put 1
-config.threshhold    = "2",           // 5, 5bit/s, 5mbit/s
-config.op            = ">",           //available: >, ==, !==, <
-config.compareMode   = "hit",         //available: dir, raw
-config.onlyMet       = false,
-config.sendMail      = true,
-config.mailService   = "gmail",
-config.mailUser      = "<your gmail user>",
-config.mailPass      = "<your gmail pass>",
-config.mailTo        = "<receiver mail>"
+//BASIC INFORMATION
+config.elhost        = "127.0.0.1"
+config.elport        = "9200"
+config.datepat       = "daily"
+config.index         = "myindex-"
 
- //YYYY.MM.dd
-function dailyPat() {
-  var t      = new Date()
-  var offset = t.getTimezoneOffset() * 60 * 1000
-  t -= -offset
-  var d      = new Date(t)
-  var mydate = d.getFullYear() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2)
-  return mydate
-}
+
+//BASIC QUERY SETUP
+config.queryString   = "tag:error"
+config.queryRange    = "@timestamp=gt:now-5m&lt:now,hit=gt:1000"
+
+
+//AGGREGATION QUERY SETUP
+config.withAggs      = false
+config.field         = ""
+config.queryUnit     = ""
+config.rawUnit       = "" 
+config.timeframe     = ""
+config.rawInterval   = 1
+config.datefield     = "@timestamp"
+
+
+//THRESHOLD DEFINATION
+config.threshold     = "1"
+config.op            = ">"
+config.compareMode   = "hit"
+config.onlyMet       = false
+
+
+//MAIL CONFIGURATION
+config.sendMail      = true
+config.mailService   = "gmail"
+config.mailUser      = "<foo@gmail.com>"
+config.mailPass      = "<password>"
+config.mailTo        = "<bar@gmail.com>"
+config.mailSubject   = "Met the threshold"
+config.mailbody      = "./mailbodies/general.pug"
 
 module.exports = config
 ```
@@ -70,3 +79,5 @@ module.exports = config
 ### TODOs
 * Fix some bugs
 * Add custom agg parameter
+* Redefine search flow
+* Add custom action

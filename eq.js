@@ -15,7 +15,8 @@ var sendMailAction  = require('./lib/sendmail').sendMailAction,
     changeUnit      = require('./lib/changeunit').changeUnit,
     parseTimeframe  = require('./lib/parsetimeframe').parseTimeframe,
     parseThreshold  = require('./lib/parsethreshold').parseThreshold,
-    parseDatepat    = require("./lib/parsedatepattern.js").parseDatepat
+    parseDatepat    = require('./lib/parsedatepattern.js').parseDatepat,
+		operators       = require('./lib/operators.js').operators
 
 program
   .version('0.1.2')
@@ -60,17 +61,6 @@ var t      = new Date(),
 var d = new Date(t)
 var mydate = d.getFullYear() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2) 
 
-// the operators (you don't say)
-var operators = {
-    '==': function(a, b) { return a == b },
-    '!==': function(a, b) { return a !== b },
-    '>': function(a, b) { return a > b },
-    '<': function(a, b) { return a < b },
-};
-
-
-//var config = require('./config')
-
 // config goes here
 var configpath = path.join(process.cwd(), program.config)
 var config     = require(configpath)
@@ -86,8 +76,9 @@ var elhost      = program.elhost        || config.elhost,
     rawunit     = program.rawUnit       || config.rawUnit,
     timeframe   = parseTimeframe(config.timeframe),
     rawinterval = program.rawInterval   || config.rawInterval,
-    threshold   = parseThreshold(config.threshold),
-    qthreshold  = threshold.thresholdval / threshold.timesecond,
+    //threshold   = parseThreshold(config.threshold),
+    //qthreshold  = threshold.thresholdval / threshold.timesecond,
+		threshold   = config.threshold
     op          = program.op            || config.op,
     comparemode = program.compareMode   || config.compareMode,
     onlymet     = program.onlyMet       || config.onlyMet,
@@ -134,7 +125,7 @@ if (queryrange) {
 //console.log(threshold.thresholdval, threshold.thresholdunit, threshold.timesecond)
 // content post to elastic
 var postcontent = {
-  "sort":[  { [datefield]: { "order" : "asc" }} ],
+  "sort":[],
   "query": {
     "bool": {
       "must": querymust
@@ -142,29 +133,14 @@ var postcontent = {
   },
 }
 
-var aggs = {
-  "val_per_interval" : {
-    "date_histogram" : {
-      "field" : "@timestamp",
-        "interval" : timeframe.timeframe
-    },
-    "aggs": {
-      "avg_val": {
-        "avg": {
-          "field": qfield
-        }
-      },
-      "val_speed": {
-        "derivative": {
-          "buckets_path": "avg_val"
-        }
-      }
-    }
-  }
+if (config.withAggs) {
+  postcontent.aggs = config.aggs
 }
 
-if (config.withAggs) {
-  postcontent.aggs = aggs
+if (config.sortField) {
+	var obj = {}
+	obj.order = config.sortOrder
+  postcontent.sort[0] = {[config.sortField]: obj}
 }
 
 var options = {
@@ -174,6 +150,8 @@ var options = {
   },
     json: postcontent
 }
+
+config.querySource = options
 
 console.log(JSON.stringify(options))
 
@@ -192,86 +170,49 @@ request.post(options,function(err, response, body){
     process.exit(1)
   }
 
-  if (comparemode == "dir") {
-    sumobj.result = resarr
-
-    body.aggregations.val_per_interval.buckets.forEach(e => {
-      var compareobj = {}
-      if (typeof(e.val_speed) == "object") {
-
-        if (operators[op](changeUnit(e.val_speed.value, rawunit, threshold.thresholdunit) / rawinterval, qthreshold)) {
-          compareobj.ismet = true
-        } else {
-          compareobj.ismet = false
-        }
-          compareobj.threshold = qthreshold
-          compareobj.value = changeUnit(e.val_speed.value, rawunit, threshold.thresholdunit) / rawinterval
-          compareobj.operater = op
-          //compareobj.timestamp = new Date (e.key + (1000 * 60 * 60 * 8))
-          compareobj.timestamp = new Date (e.key)
-          resarr.push(compareobj)
-      } else {
-        resarr.push({})
-      }
-    })
-
-
-  var ismetarr = resarr.filter(e => e.ismet)
-//  console.log(resarr)
-
-  sumobj.metcount = ismetarr.length
-  if (sumobj.metcount > 0) {
-    sumobj.ismet = true
-    sumobj.lastmetvalue = ismetarr[ismetarr.length-1]["value"]
-    sumobj.lastmettime  = ismetarr[ismetarr.length-1]["timestamp"]
-  } else {
-    sumobj.ismet = false
+	
+  if (body.hits.hits.length > 0) {
+    sumobj.lastvalue = body.hits.hits[body.hits.hits.length-1]["_source"][qfield]
   }
-  sumobj.lastvalue = resarr[resarr.length-1]["value"]
 
-  } else if (comparemode == "hit") {
-    if (body.hits.hits.length > 0) {
-      sumobj.lastvalue = body.hits.hits[body.hits.hits.length-1]["_source"][qfield]
-    }
-    if (operators[op](body.hits.total, qthreshold)) {
+	if (comparemode == "hit") {
+
+    sumobj.hitscount = body.hits.total
+    sumobj.hits = body.hits.hits
+
+    if (operators[op](body.hits.total, threshold)) {
       sumobj.ismet = true
     } else {
       sumobj.ismet = false
     }
-  } else {
-    console.log("available mode: dir / hit")
-    program.outputHelp(make_blue);
-    process.exit();        
-  }
-  sumobj.threshold = qthreshold
+
+	} else if (comparemode == "agg") {
+
+		var obj = body.aggregations
+		var hitscount = Object.values(obj)[0]["buckets"].length
+		var hits = Object.values(obj)[0]["buckets"]
+    sumobj.hitscount = hitscount
+    sumobj.hits = hits
+
+    if (operators[op](hitscount, threshold)) {
+      sumobj.ismet = true
+    } else {
+      sumobj.ismet = false
+    }
+	}
+
+  sumobj.threshold = threshold
   sumobj.operator = op
-  sumobj.hitscount = body.hits.total
-  sumobj.hits = body.hits.hits
 
 	console.log(JSON.stringify(sumobj))
+
+	if (sendmail) {
+    sendMailAction(config, sumobj)
+	}
 
 // Output
   if (onlymet && !sumobj.ismet) {
     process.exit()
-  }
-
-  if (sumobj.ismet) {
-    if (sendmail) {
-      var mailbody
-
-      if (comparemode == "hit") {
-        mailbody = '觸發設置的次數(' + threshold.thresholdval + '次), 當前次數: ' + sumobj.hitscount + '次<br>' 
-      } else if (comparemode == "dir") {
-        mailbody = '觸發設置的速度(' + threshold.threshold + '), ' + sumobj.metcount + '次<br>' 
-        mailbody += '最後值: ' + parseFloat(sumobj.lastmetvalue.toFixed(2))  +  ' ' + threshold.thresholdunit+ '/' + threshold.timeunit + '<br>'
-        mailbody += '出現於: ' + sumobj.lastmettime + '<br>'
-      }
-
-      mailbody += '索引: ' + index + '<br>'
-      mailbody += '查詢字串: ' + program.queryString + '<br>'
-      mailbody += '查詢範圍: ' + program.queryRange + '<br>'
-      sendMailAction(config, sumobj)
-    }
   }
 
 })
