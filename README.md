@@ -7,7 +7,7 @@ Although we have Elastalert, but as far as I know, they don't provide derivative
 <br>
 
 ### Usage
-`node eq.js -q foo.keyword:tux -r "@timestamp=gt:now-5m&lt:now"`
+`node eq.js -c configs/wsa_hit.js`
 
 <br>
 
