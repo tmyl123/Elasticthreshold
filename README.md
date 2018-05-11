@@ -16,13 +16,9 @@ Although we have Elastalert, but as far as I know, they don't provide derivative
 `elhost` : Elasticsearch host  
 `elport` : Elaticsearch port  
 `index` : Index to query  
-`field` : Aggregation field. use only in `dir` mode  
-`rawUnit` : The origin unit in your data. use only in `dir` mode  
-`timeframe` : How many time in a bucket.  
-`rawInterval` : If your data have polling interval, put interval here, otherwise put 1  
 `threshhold` : The threshold to define an alert  
 `op` : The operator compare to each query result  
-`compareMode` : Support `hit` mode and `dir` mode  
+`compareMode` : Support `hit` mode and `agg` mode  
 `onlyMet` : Output only when threshold is met  
 `sendMail` : If we are going to send mail or not  
 
@@ -34,50 +30,71 @@ Although we have Elastalert, but as far as I know, they don't provide derivative
 var config       = {}
 
 //BASIC INFORMATION
-config.elhost        = "127.0.0.1"
+config.elhost        = "127.0.01"
 config.elport        = "9200"
 config.datepat       = "daily"
 config.index         = "myindex-"
 
 
-//BASIC QUERY SETUP
-config.queryString   = "tag:error"
-config.queryRange    = "@timestamp=gt:now-5m&lt:now,hit=gt:1000"
-
-
-//AGGREGATION QUERY SETUP
-config.withAggs      = false
-config.field         = ""
-config.queryUnit     = ""
-config.rawUnit       = "" 
-config.timeframe     = ""
-config.rawInterval   = 1
-config.datefield     = "@timestamp"
-
+//QUERYSETUP
+config.postContent = {
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+          "tag.keyword": "ERROR"
+          }
+        },
+        {
+          "range": {
+            "hit": {
+              "gt": "10",
+            }
+          }
+        },
+        {
+          "range": {
+            "@timestamp": {
+              "gt": "now-5m",
+              "lt": "now"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
 
 //THRESHOLD DEFINATION
-config.threshold     = "1"
-config.op            = ">"
 config.compareMode   = "hit"
-config.onlyMet       = false
+config.threshold     = 1
+config.op            = ">"
+
+
+//EXTRA OUTPUT
+config.interestedField = ["host", "hit", "@timestamp"]
 
 
 //MAIL CONFIGURATION
 config.sendMail      = true
 config.mailService   = "gmail"
-config.mailUser      = "<foo@gmail.com>"
-config.mailPass      = "<password>"
-config.mailTo        = "<bar@gmail.com>"
+config.mailUser      = "<tux@gmail.com>"
+config.mailPass      = "<tuxbestpassword>"
+config.mailTo        = "<foo@gmail.com>"
 config.mailSubject   = "Met the threshold"
-config.mailbody      = "./mailbodies/general.pug"
+config.mailbody      = "/home/user/eq/mailbodies/general.pug"
+
+//MISCELLANEOUS
+config.onlyMet       = false
 
 module.exports = config
+
 ```
 
 <br>
 
 ### TODOs
 * Fix some bugs
-* Add custom agg parameter
-* Redefine search flow
 * Add custom action
+* Add some extrafunction to result(change unit, timezone.. etc)
