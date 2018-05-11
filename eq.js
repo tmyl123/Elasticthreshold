@@ -16,7 +16,7 @@ var sendMailAction  = require('./lib/sendmail').sendMailAction,
     parseTimeframe  = require('./lib/parsetimeframe').parseTimeframe,
     parseThreshold  = require('./lib/parsethreshold').parseThreshold,
     parseDatepat    = require('./lib/parsedatepattern.js').parseDatepat,
-		operators       = require('./lib/operators.js').operators
+    operators       = require('./lib/operators.js').operators
 
 program
   .version('0.1.2')
@@ -25,8 +25,6 @@ program
   .option('-p, --elport [value]', 'Elasticsearch port. Default: 9200')
   .option('--index [value]', 'Index pattern. Default: collectd-YYYY.MM.dd')
   .option('--op [value]', 'Support > == !== <. Default >')
-  //.option('-q, --query-string [value]', 'host.keyword:Moo_Kibana01,type_instance:ens160 Default: none')
-  //.option('-r, --query-range [value]', '@timestamp=gt:now-2m&lt:now,value=gt:1000')
   .option('-T, --threshold [value]', 'You dont say')
   .option('-m, --compare-mode [mode]', 'Accept hit / dir. Default: hit')
   .option('-o, --only-met', 'Output only when threshold is met')
@@ -53,13 +51,12 @@ var config     = require(configpath)
 var elhost      = program.elhost        || config.elhost,
     elport      = program.elport        || config.elport,
     index       = program.index         || config.index, 
-    datefield   = program.datefield     || config.datefield,
-    rawinterval = program.rawInterval   || config.rawInterval,
-		threshold   = config.threshold,
+    datefield   = config.datefield,
+    threshold   = config.threshold,
     op          = program.op            || config.op,
     comparemode = program.compareMode   || config.compareMode,
     onlymet     = program.onlyMet       || config.onlyMet,
-    sendmail    = program.sendMail      || config.sendMail,
+    sendmail    = program.sendMail      || config.sendMail
 
 if (config.datepat) {
   index = index + parseDatepat(config.datepat)
@@ -101,7 +98,7 @@ request.post(options,function(err, response, body){
 //    sumobj.lastvalue = body.hits.hits[body.hits.hits.length-1]["_source"][qfield]
 //  }
 
-	if (comparemode == "hit") {
+  if (comparemode == "hit") {
 
     sumobj.hitscount = body.hits.total
     sumobj.hits = body.hits.hits
@@ -112,11 +109,11 @@ request.post(options,function(err, response, body){
       sumobj.ismet = false
     }
 
-	} else if (comparemode == "agg") {
+  } else if (comparemode == "agg") {
 
-		var obj = body.aggregations
-		var hitscount = Object.values(obj)[0]["buckets"].length
-		var hits = Object.values(obj)[0]["buckets"]
+    var obj = body.aggregations
+    var hitscount = Object.values(obj)[0]["buckets"].length
+    var hits = Object.values(obj)[0]["buckets"]
     sumobj.hitscount = hitscount
     sumobj.hits = hits
 
@@ -125,20 +122,23 @@ request.post(options,function(err, response, body){
     } else {
       sumobj.ismet = false
     }
-	}
+  }
 
   sumobj.threshold = threshold
   sumobj.operator = op
 
-	console.log(JSON.stringify(sumobj))
+  console.log(JSON.stringify(sumobj))
 
-	if (sendmail) {
-    sendMailAction(config, sumobj)
-	}
 
 // Output
-  if (onlymet && !sumobj.ismet) {
-    process.exit()
+  if (sumobj.ismet) {
+    if (sendmail) {
+      sendMailAction(config, sumobj)
+    }
+  } else {
+    if (onlymet) {
+      process.exit()
+    }
   }
 
 })
