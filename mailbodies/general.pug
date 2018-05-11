@@ -1,18 +1,24 @@
 //
-//This template receive query result
-//and configuration
+//This template receive config and data
+//
 p 索引: #{config.fullIndex}
-p 查詢字串: #{config.queryString}
-p 查詢範圍: #{config.queryRange}
 
 p 設置的觸發筆數: #{data.threshold}
 p 當前次數: #{data.hitscount}
 
 p 觸發紀錄(至多十筆):
 
-ul
-  each val in data.hits
-    li= val._source.domain + ': ' + val._source.hit
+div
+  table
+    thead
+      tr
+        each f in config.interestedField
+          th #{f}
+    tbody
+      each r in data.interestedRes
+        tr
+          each f in config.interestedField
+            td #{r[f]}
 
 p 完整搜尋句柄
 

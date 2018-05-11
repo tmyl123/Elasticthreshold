@@ -16,7 +16,9 @@ var sendMailAction  = require('./lib/sendmail').sendMailAction,
     parseTimeframe  = require('./lib/parsetimeframe').parseTimeframe,
     parseThreshold  = require('./lib/parsethreshold').parseThreshold,
     parseDatepat    = require('./lib/parsedatepattern.js').parseDatepat,
-    operators       = require('./lib/operators.js').operators
+    operators       = require('./lib/operators.js').operators,
+		findPropPath    = require('./lib/objutils.js').findPropPath,
+		useObjPath      = require('./lib/objutils.js').useObjPath
 
 program
   .version('0.1.2')
@@ -51,12 +53,12 @@ var config     = require(configpath)
 var elhost      = program.elhost        || config.elhost,
     elport      = program.elport        || config.elport,
     index       = program.index         || config.index, 
-    datefield   = config.datefield,
-    threshold   = config.threshold,
+    threshold   = program.threshold     || config.threshold,
     op          = program.op            || config.op,
     comparemode = program.compareMode   || config.compareMode,
     onlymet     = program.onlyMet       || config.onlyMet,
-    sendmail    = program.sendMail      || config.sendMail
+    sendmail    = config.sendMail
+    interestedfield = config.interestedField
 
 if (config.datepat) {
   index = index + parseDatepat(config.datepat)
@@ -80,7 +82,7 @@ console.log(JSON.stringify(options))
 
 // result goes here
 var sumobj = {}
-var resarr = []
+var interestedRes = []
 
 request.post(options,function(err, response, body){
 
@@ -102,6 +104,16 @@ request.post(options,function(err, response, body){
 
     sumobj.hitscount = body.hits.total
     sumobj.hits = body.hits.hits
+		sumobj.hits.forEach(e => {
+			var hitobj = {}
+			interestedfield.forEach(interestedkey => {
+        if (interestedkey in e._source) {
+          hitobj[interestedkey] = e._source[interestedkey]
+				}
+			})
+			interestedRes.push(hitobj)
+		})
+		sumobj.interestedRes = interestedRes
 
     if (operators[op](body.hits.total, threshold)) {
       sumobj.ismet = true
@@ -116,6 +128,16 @@ request.post(options,function(err, response, body){
     var hits = Object.values(obj)[0]["buckets"]
     sumobj.hitscount = hitscount
     sumobj.hits = hits
+		sumobj.hits.forEach(e => {
+			var hitobj = {}
+			interestedfield.forEach(interestedkey => {
+        if (interestedkey in e) {
+          hitobj[interestedkey] = e[interestedkey].value
+				}
+			})
+			interestedRes.push(hitobj)
+		})
+		sumobj.interestedRes = interestedRes
 
     if (operators[op](hitscount, threshold)) {
       sumobj.ismet = true
@@ -128,7 +150,6 @@ request.post(options,function(err, response, body){
   sumobj.operator = op
 
   console.log(JSON.stringify(sumobj))
-
 
 // Output
   if (sumobj.ismet) {
