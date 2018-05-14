@@ -20,6 +20,11 @@ div
           each f in config.interestedField
             td #{r[f]}
 
+br
+
+if config.referenceLink
+  a(href=config.referenceLink) #{config.referenceName}
+
 p 完整搜尋句柄
 
 pre !{JSON.stringify(config.querySource, undefined, 2)}

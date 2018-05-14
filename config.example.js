@@ -44,7 +44,9 @@ config.op            = ">"
 
 
 //EXTRA OUTPUT
-config.interestedField = ["host", "hit", "@timestamp"]
+config.interestedField   = ["host", "hit", "@timestamp"]
+config.referenceLink     = "http://kibana/searchresult"
+config.referenceName     = "kibana search result"
 
 
 //MAIL CONFIGURATION
