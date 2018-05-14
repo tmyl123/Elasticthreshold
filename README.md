@@ -74,6 +74,8 @@ config.op            = ">"
 
 //EXTRA OUTPUT
 config.interestedField = ["host", "hit", "@timestamp"]
+config.referenceLink     = "http://kibana/searchresult"
+config.referenceName     = "kibana search result"
 
 
 //MAIL CONFIGURATION
@@ -89,7 +91,6 @@ config.mailbody      = "/home/user/eq/mailbodies/general.pug"
 config.onlyMet       = false
 
 module.exports = config
-
 ```
 
 <br>
