@@ -21,7 +21,7 @@ although we have Elastalert, but AFAIK they don't provide derivative aggregation
 <br>
 
 ### Usage
-`node eq.js -c myconfig.js`
+`node ethold.js -c myconfig.js`
 
 <br>
 
@@ -101,7 +101,7 @@ config.mailUser      = "<tux@gmail.com>"
 config.mailPass      = "<tuxbestpassword>"
 config.mailTo        = "<foo@gmail.com>"
 config.mailSubject   = "Met the threshold"
-config.mailbody      = "/home/user/eq/mailbodies/general.pug"
+config.mailbody      = "/home/user/Elasticthreshold/mailbodies/general.pug"
 
 //MISCELLANEOUS
 config.onlyMet       = false
