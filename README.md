@@ -8,7 +8,9 @@ although we have Elastalert, but AFAIK they don't provide derivative aggregation
 
 ### Download
 `git clone https://github.com/tmyl123/elasticthreshold.git`
+
 `cd elasticthreshold`
+
 `npm install`
 
 <br>
