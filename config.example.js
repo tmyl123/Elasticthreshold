@@ -1,7 +1,7 @@
 var config       = {}
 
 //BASIC INFORMATION
-config.elhost        = "127.0.01"
+config.elhost        = "127.0.0.1"
 config.elport        = "9200"
 config.datepat       = "daily"
 config.index         = "myindex-"
