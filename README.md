@@ -7,7 +7,7 @@ although we have Elastalert, but AFAIK they don't provide derivative aggregation
 <br>
 
 ### Download
-`git clone https://github.com/tmyl123/elasticthreshold.git`
+`git clone https://github.com/tmyl123/Elasticthreshold.git`
 
 `cd elasticthreshold`
 
