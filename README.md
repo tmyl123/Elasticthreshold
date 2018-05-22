@@ -18,10 +18,14 @@ although we have Elastalert, but AFAIK they don't provide derivative aggregation
 ### Config
 `cp config.example.js myconfig.js` and fill up the needed information and the query you are interested in.
 
+<br>
+
 ### Usage
 `node eq.js -c myconfig.js`
 
 <br>
+
+---
 
 ### Config file & Parameter explaination
 
