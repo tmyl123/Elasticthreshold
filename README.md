@@ -1,13 +1,23 @@
-# eqtool (temp name)
+# elasticthreshold
 
 ### Description
-this tool is make for querying threshold in elasticsearch.  
-Although we have Elastalert, but as far as I know, they don't provide derivative aggregation query, which we use them a lot.
+This tool is make for querying threshold in elasticsearch. It may not be the most easy to use tool, but elastic enough.
+although we have Elastalert, but AFAIK they don't provide derivative aggregation query, which we use them a lot.
 
 <br>
 
+### Download
+`git clone https://github.com/tmyl123/elasticthreshold.git`
+`cd elasticthreshold`
+`npm install`
+
+<br>
+
+### Config
+`cp config.example.js myconfig.js` and fill up the needed information and the query you are interested in.
+
 ### Usage
-`node eq.js -c configs/wsa_hit.js`
+`node eq.js -c myconfig.js`
 
 <br>
 
