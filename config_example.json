@@ -1,0 +1,59 @@
+{
+  "name": "config_example",
+  "interval": "1",
+  "elhost": "127.0.01",
+  "elport": "9200",
+  "datepat": "daily",
+  "index": "logstash-",
+  "compareMode": "hit",
+  "threshold": "1",
+  "op": ">",
+  "interestedField": [
+    "@timestamp",
+    "message"
+  ],
+  "referenceLink": "http://kibana/searchresult",
+  "referenceName": "kibana search result",
+  "sendMail": true,
+  "mailService": "gmail",
+  "mailUser": "tux@gmail.com",
+  "mailPass": "tuxxpassword",
+  "mailTo": "fish@gmail.com",
+  "mailSubject": "Met the threshold",
+  "mailbody": "/home/<user>/Mygit/ethold/mailbodies/general.pug",
+  "onlyMet": false,
+  "postContent": {
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "range": {
+              "filesize": {
+                "gt": "102400"
+              }
+            }
+          },
+          {
+            "range": {
+              "@timestamp": {
+                "gt": "now-1h",
+                "lt": "now"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "status": {
+    "isediting": false,
+    "isrunning": false,
+    "timer": 60,
+    "runTimer": 0,
+    "period": 0,
+    "passtest": false
+  },
+  "_cellVariants": {
+    "ismet": "success"
+  }
+}
