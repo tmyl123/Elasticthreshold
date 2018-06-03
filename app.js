@@ -69,9 +69,7 @@ io.on('connect', function(socket) {
 
 
 //app.get('/', function(req, res) {
-//	console.log(req)
-//  //res.sendFile(__dirname + './dist/index.html');
-//  res.sendFile("foo");
+//  res.sendFile(__dirname + '/index.html');
 //});
 
 
