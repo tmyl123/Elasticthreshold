@@ -443,7 +443,7 @@ export default {
 	  toggleStat(item, index, button) {
 			var self = this
 			//USER MUST PASS CONFIG TEST FIRST
-			if (!item.status.passtest) {
+			if (!item.status.passtest && !item.status.isrunning) {
 			  self.showAlert({variant: "danger", text: "Please pass test first"})
 			} else {
 			  item.status.isrunning = !item.status.isrunning
