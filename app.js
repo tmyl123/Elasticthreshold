@@ -98,6 +98,7 @@ app.get('/getallconf', function(req, res) {
 //GET MAIL TEMPLATES
 app.get('/getmailtemplate', function(req, res) {
   var files = fs.readdirSync(mailBodyPath)
+	files = files.map(e => mailBodyPath + '/' + e)
   res.send(files);
 });
 
@@ -105,7 +106,6 @@ app.get('/getmailtemplate', function(req, res) {
 //WRITE CONFIG
 function writeConf(config, callback) {
   console.log(config.name)
-	config.mailbody = mailBodyPath + '/' + config.mailbody
   fs.writeFile('./configs/' + config.name + '.json' ,JSON.stringify(config, undefined, 2), (err) => {
     if (err) throw err
     callback()
