@@ -496,6 +496,13 @@ export default {
         invalid ++
       }
 
+			//IF JSON IS NOT VALID
+			try {
+        JSON.parse(this.postContent);
+      } catch (e) {
+        invalid ++
+      }
+
       if (invalid > 0) {
         return false
       } else {
