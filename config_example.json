@@ -1,7 +1,7 @@
 {
   "name": "config_example",
   "interval": "1",
-  "elhost": "127.0.01",
+  "elhost": "127.0.0.1",
   "elport": "9200",
   "datepat": "daily",
   "index": "logstash-",
@@ -9,19 +9,18 @@
   "threshold": "1",
   "op": ">",
   "interestedField": [
-    "@timestamp",
-    "message"
+    "filesize",
+    "filename"
   ],
   "referenceLink": "http://kibana/searchresult",
-  "referenceName": "kibana search result",
+  "extraMailBody": "If you receive this mail \n it means the file size of the log is too big\n please check if the service is normal.",
   "sendMail": true,
   "mailService": "gmail",
   "mailUser": "tux@gmail.com",
-  "mailPass": "tuxxpassword",
+  "mailPass": "tuxPassword",
   "mailTo": "fish@gmail.com",
   "mailSubject": "Met the threshold",
-  "mailbody": "/home/<user>/Mygit/ethold/mailbodies/general.pug",
-  "onlyMet": false,
+  "mailbody": "",
   "postContent": {
     "query": {
       "bool": {
@@ -29,7 +28,7 @@
           {
             "range": {
               "filesize": {
-                "gt": "102400"
+                "gt": "10240"
               }
             }
           },

@@ -5,8 +5,8 @@
 //
 //===================================//
 
-var   request = require('request'),
-      path    = require('path')
+var request = require('request'),
+    path    = require('path')
 
 
 var sendMailAction  = require('./lib/sendmail').sendMailAction,
@@ -15,8 +15,8 @@ var sendMailAction  = require('./lib/sendmail').sendMailAction,
     parseThreshold  = require('./lib/parsethreshold').parseThreshold,
     parseDatepat    = require('./lib/parsedatepattern.js').parseDatepat,
     operators       = require('./lib/operators.js').operators,
-		findPropPath    = require('./lib/objutils.js').findPropPath,
-		useObjPath      = require('./lib/objutils.js').useObjPath
+    findPropPath    = require('./lib/objutils.js').findPropPath,
+    useObjPath      = require('./lib/objutils.js').useObjPath
 
 
 
@@ -25,7 +25,7 @@ function ethold(config, callback) {
 
   // result goes here
   var sumobj  = {},
-			infoObj = {},
+      infoObj = {},
       interestedRes = []
   
   var elhost          =  config.elhost,
@@ -49,34 +49,34 @@ function ethold(config, callback) {
   var options = {
     url: "http://" + elhost + ":" + elport + "/" + index + "/_search",
     headers: { 'Content-Type': 'application/json' },
-		timeout: 2000,
+    timeout: 2000,
     json: postcontent
   }
   
   
   //console.log(JSON.stringify(options))
-	infoObj.requestOptions = options
+  infoObj.requestOptions = options
 
 
   request.post(options,function(err, response, body){
   
     //if (err) throw err
     if (err) {
-		  console.log("ERR")
-		  console.log(err)
-			callback(err)
-			return
-		}
+      console.log("ERR")
+      console.log(err)
+      callback(err)
+      return
+    }
   
     //console.log(JSON.stringify(body))
-		infoObj.requestResult = body
+    infoObj.requestResult = body
   
     if (body.error) {
-		  console.log("BODY ERR")
+      console.log("BODY ERR")
       console.log(JSON.stringify(body.error))
       callback(body.error)
       //process.exit(0)
-			return
+      return
     }
   
   
@@ -84,16 +84,16 @@ function ethold(config, callback) {
   
       sumobj.hitscount = body.hits.total
       sumobj.hits = body.hits.hits
-  		sumobj.hits.forEach(e => {
-  			var hitobj = {}
-  			interestedfield.forEach(interestedkey => {
+      sumobj.hits.forEach(e => {
+        var hitobj = {}
+        interestedfield.forEach(interestedkey => {
           if (interestedkey in e._source) {
             hitobj[interestedkey] = e._source[interestedkey]
-  				}
-  			})
-  			interestedRes.push(hitobj)
-  		})
-  		sumobj.interestedRes = interestedRes
+          }
+        })
+        interestedRes.push(hitobj)
+      })
+      sumobj.interestedRes = interestedRes
   
       if (operators[op](body.hits.total, threshold)) {
         sumobj.ismet = true
@@ -108,16 +108,16 @@ function ethold(config, callback) {
       var hits = Object.values(obj)[0]["buckets"]
       sumobj.hitscount = hitscount
       sumobj.hits = hits
-  		sumobj.hits.forEach(e => {
-  			var hitobj = {}
-  			interestedfield.forEach(interestedkey => {
+      sumobj.hits.forEach(e => {
+        var hitobj = {}
+        interestedfield.forEach(interestedkey => {
           if (interestedkey in e) {
             hitobj[interestedkey] = e[interestedkey].value
-  				}
-  			})
-  			interestedRes.push(hitobj)
-  		})
-  		sumobj.interestedRes = interestedRes
+          }
+        })
+        interestedRes.push(hitobj)
+      })
+      sumobj.interestedRes = interestedRes
   
       if (operators[op](hitscount, threshold)) {
         sumobj.ismet = true
@@ -140,7 +140,7 @@ function ethold(config, callback) {
       }
     }
 
-		infoObj.summary = sumobj
+    infoObj.summary = sumobj
   
     callback(infoObj)
   })

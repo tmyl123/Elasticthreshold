@@ -2,10 +2,8 @@
 //This template receive config and data
 //
 p 索引: #{config.fullIndex}
-
-p 設置的觸發筆數: #{data.threshold}
+p 設置的觸發筆數: #{config.op} #{config.threshold}
 p 當前次數: #{data.hitscount}
-
 p 觸發紀錄(至多十筆):
 
 div
@@ -22,9 +20,14 @@ div
 
 br
 
+p 說明敘述:
+pre #{config.extraMailBody}
+
+br
+
 if config.referenceLink
-  a(href=config.referenceLink) #{config.referenceName}
+  a(href=config.referenceLink) 參考連結
 
 p 完整搜尋句柄
 
-pre !{JSON.stringify(config.querySource, undefined, 2)}
+pre !{JSON.stringify(config.postContent, undefined, 2)}
