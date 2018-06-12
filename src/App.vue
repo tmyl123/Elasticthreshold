@@ -45,15 +45,23 @@
             </b-button-group>
           </template>
           <template slot="ismet" slot-scope="row">
-          {{ pseudoStat[row.index].ismet }}
+            {{ pseudoStat[row.index].ismet }}
           </template>
           <template slot="timer" slot-scope="row">
             <!--        {{ allconfigs[row.index].status.runTimer }}-->
-          {{ pseudoStat[row.index].runTimer }}
+            {{ pseudoStat[row.index].runTimer }}
           </template>
           <template slot="period" slot-scope="row">
             <!--        {{ allconfigs[row.index].status.period }}-->
-          {{ pseudoStat[row.index].period }}
+            {{ pseudoStat[row.index].period }}
+          </template>
+          <template slot="view" slot-scope="row">
+						<b-btn :id="'config' + row.index">?</b-btn>
+						<b-tooltip 
+							:target="'config' + row.index" 
+							:title="itemtooltips(row.item)"
+							placement="right"
+							></b-tooltip>
           </template>
           </b-table>
         </b-col>
@@ -259,7 +267,8 @@ export default {
         'run_test',
         'ismet',
         'timer',
-        'period'
+        'period',
+				'view'
       ],
       postContent: "",
       originItemName: "",
@@ -277,7 +286,7 @@ export default {
         "ismet": false,
         "passtest": false
       },
-			mailbodyoptions: []
+      mailbodyoptions: []
     }
   },
   methods: {
@@ -447,6 +456,10 @@ export default {
       //USER MUST PASS CONFIG TEST FIRST
       if (!item.status.passtest && !item.status.isrunning) {
         self.showAlert({variant: "danger", text: "Please pass test first"})
+      //AS WELL AS SAVING CONFIG
+      } else if (item.status.isediting) {
+        console.log('user start with edit')
+        self.showAlert({variant: "danger", text: "Please save config before start"})
       } else {
         item.status.isrunning = !item.status.isrunning
         if (!item.status.isrunning) {
@@ -496,8 +509,8 @@ export default {
         invalid ++
       }
 
-			//IF JSON IS NOT VALID
-			try {
+      //IF JSON IS NOT VALID
+      try {
         JSON.parse(this.postContent);
       } catch (e) {
         invalid ++
@@ -509,10 +522,33 @@ export default {
         return true
       }
     },
-		getMailTemplate() {
+    getMailTemplate() {
        axios.get(backendUrl + '/getmailtemplate').then(res => {
           this.mailbodyoptions = res.data
        })
+    },
+		itemtooltips(item) {
+			var prettyitem = ""
+			prettyitem += 'Name: ' + item.name + '\n'
+			prettyitem += 'Interval: ' + item.interval + '\n'
+			prettyitem += 'Elastic: ' + item.elhost + ':' + item.elport + '\n'
+			prettyitem += 'Datepat: ' + item.datepat + '\n'
+			prettyitem += 'Index: ' + item.index + '\n'
+			prettyitem += 'Comparemode: ' + item.compareMode + '\n'
+			prettyitem += 'Threshold: ' + item.threshold + '\n'
+			prettyitem += 'OP: ' + item.op + '\n'
+			prettyitem += 'Interested: ' + item.interestedField + '\n'
+			prettyitem += 'PostContent: ' + JSON.stringify(item.postContent) + '\n'
+			prettyitem += 'Sendmail: ' + item.sendMail + '\n'
+			prettyitem += 'Mailservice: ' + item.mailService + '\n'
+			prettyitem += 'Mailuser: ' + item.mailUser + '\n'
+			prettyitem += 'Mailpass: ' + item.mailPass + '\n'
+			prettyitem += 'Mailto: ' + item.mailTo + '\n'
+			prettyitem += 'Mailtemplate: ' + item.mailbody + '\n'
+			prettyitem += 'Mailsubject: ' + item.mailSubject + '\n'
+			prettyitem += 'Ref link: ' + item.referenceLink + '\n'
+			prettyitem += 'Mail body: ' + item.extraMailBody + '\n'
+		  return prettyitem
 		}
   },
   mounted() {
