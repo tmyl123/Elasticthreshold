@@ -34,7 +34,7 @@ function cronStart(config) {
 		runTimer --
 		if (runTimer == 0) {
 		  ethold(config, function(queryRes) {
-	      console.log(queryRes)
+//	      console.log(queryRes)
 
 		    taskFarm[config.name].ismet = queryRes.summary.ismet
 
@@ -56,7 +56,7 @@ function cronStart(config) {
 
 			config.status.ismet    = taskFarm[config.name].ismet
 
-	    console.log(cronname, taskFarm[cronname].runTimer,  taskFarm[cronname].period, taskFarm[config.name].ismet)
+//	    console.log(cronname, taskFarm[cronname].runTimer,  taskFarm[cronname].period, taskFarm[config.name].ismet)
 
 			fs.writeFileSync(configFileName, JSON.stringify(config, undefined, 2))
 		}

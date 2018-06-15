@@ -167,9 +167,9 @@ app.post('/copyconf', function(req, res) {
 
 //TEST CONFIG
 app.post('/testconf', function(req, res) {
-		console.log(req.body.item)
+//		console.log(req.body.item)
   ethold(req.body.item, function(queryRes) {
-    console.log(queryRes)
+//    console.log(queryRes)
     res.send(queryRes)
   })
 })
