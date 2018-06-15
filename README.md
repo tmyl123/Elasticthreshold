@@ -9,13 +9,15 @@ although we have Elastalert, but AFAIK they don't provide derivative aggregation
 ### Download
 `git clone https://github.com/tmyl123/Elasticthreshold.git`
 
-`cd elasticthreshold`
+`cd Elasticthreshold`
 
 `npm install`
 
 <br>
 
 ### Config
+`mkdir configs`
+
 `cp config_example.json configs` 
 
 <br>
