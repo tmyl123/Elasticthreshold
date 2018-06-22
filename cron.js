@@ -26,8 +26,10 @@ function cronInit() {
 function cronStart(config) {
 		console.log("CRON START")
 	var interval = config.interval * 60 * 1000,
-		  runTimer = interval / 1000,
-		  period   = 0
+		  runTimer = interval / 1000
+				
+	var ismet      = config.status.ismet || false ,
+	    recurrence = config.status.recurrence || 0
   
   taskFarm[config.name] = setInterval(function() {
 
@@ -36,27 +38,31 @@ function cronStart(config) {
 		  ethold(config, function(queryRes) {
 //	      console.log(queryRes)
 
-		    taskFarm[config.name].ismet = queryRes.summary.ismet
-
-		    period ++
 			  runTimer = interval / 1000
+
+				if (ismet !== queryRes.summary.ismet) {
+				  recurrence = 0
+				} else {
+					recurrence ++
+				}
 	    })
 		}
 
 		taskFarm[config.name].runTimer = runTimer
-		taskFarm[config.name].period   = period
+		taskFarm[config.name].ismet    = ismet
 
     //WRITE STAT INTO CONFIG.STATUS
 		for (var cronname in taskFarm) {
 			const configFileName = './configs/' + cronname  +'.json'
 		  const config = JSON.parse(fs.readFileSync(configFileName))
 
-			config.status.runTimer = taskFarm[cronname].runTimer
-			config.status.period   = taskFarm[cronname].period
+			config.status.runTimer   = taskFarm[cronname].runTimer
+			config.status.ismet      = taskFarm[config.name].ismet
 
-			config.status.ismet    = taskFarm[config.name].ismet
+			config.status.recurrence = recurrence
 
-//	    console.log(cronname, taskFarm[cronname].runTimer,  taskFarm[cronname].period, taskFarm[config.name].ismet)
+
+	    console.log(cronname, taskFarm[cronname].runTimer, taskFarm[config.name].ismet, recurrence)
 
 			fs.writeFileSync(configFileName, JSON.stringify(config, undefined, 2))
 		}

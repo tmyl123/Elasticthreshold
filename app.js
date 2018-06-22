@@ -1,15 +1,15 @@
-var http       = require('http'),
-    express    = require('express'),
-    app        = express(),
-    server     = http.createServer(app),
-    io         = require('socket.io').listen(server),
-    fs         = require('fs'),
-    bodyParser = require('body-parser'),
-    ethold     = require('./ethold.js').ethold,
+var http           = require('http'),
+    express        = require('express'),
+    app            = express(),
+    server         = http.createServer(app),
+    io             = require('socket.io').listen(server),
+    fs             = require('fs'),
+    bodyParser     = require('body-parser'),
+    ethold         = require('./ethold.js').ethold,
     normalizedPath = require("path").join(__dirname, "configs"),
     mailBodyPath   = require("path").join(__dirname, "mailbodies"),
-    cron       = require('./cron.js'),
-    path       = require('path')
+    cron           = require('./cron.js'),
+    path           = require('path')
 
 //PATH
 app.use(express.static(__dirname + '/dist/'));

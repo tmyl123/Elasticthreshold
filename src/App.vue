@@ -32,8 +32,11 @@
         </template>
         <template slot="edit_item" slot-scope="row">
           <b-button-group>
+						<b-button size="sm" variant="primary"  @click.stop="edit(row.item, row.index, $event.target); $refs.editModal.show()" class="mr-2">edit</b-button>
+						<!--
             <b-button size="sm" variant="primary" v-show="!row.item.status.isediting" @click.stop="edit(row.item, row.index, $event.target)" class="mr-2">edit</b-button>
             <b-button size="sm" variant="primary" v-show="row.item.status.isediting" @click.stop="save(row.item, row.index, $event.target)" class="mr-2">save</b-button>
+						-->
             <b-button size="sm" variant="primary" @click.stop="copy(row.item, row.index, $event.target)" class="mr-2">copy</b-button>
             <b-button size="sm" variant="danger" @click.stop="remove(row.item, row.index, $event.target)" class="mr-2">remove</b-button>
           </b-button-group>
@@ -46,13 +49,12 @@
         <template slot="ismet" slot-scope="row">
           {{ pseudoStat[row.index].ismet }}
         </template>
+        <template slot="recurrence" slot-scope="row">
+          {{ pseudoStat[row.index].recurrence }}
+        </template>
         <template slot="timer" slot-scope="row">
           <!--        {{ allconfigs[row.index].status.runTimer }}-->
           {{ pseudoStat[row.index].runTimer }}
-        </template>
-        <template slot="period" slot-scope="row">
-          <!--        {{ allconfigs[row.index].status.period }}-->
-          {{ pseudoStat[row.index].period }}
         </template>
         <template slot="view" slot-scope="row">
 					<b-btn :id="'config' + row.index">?</b-btn>
@@ -68,7 +70,166 @@
         <b-col>
           <pre v-html="testResult"></pre>
 				</b-col>
-        <b-col cols="5">
+				<b-modal ref="editModal" size="lg">
+          <b-row>
+              <b-col>
+                <b-input-group prepend="Name">
+                  <b-form-input type="text" v-model="editingItem.name"></b-form-input>
+                </b-input-group>
+              </b-col>
+          </b-row>
+          <b-row>
+              <b-col>
+                <b-input-group prepend="Interval">
+                  <b-form-input type="number" v-model="editingItem.interval"></b-form-input>
+                </b-input-group>
+              </b-col>
+          </b-row>
+          <b-row>
+              <b-col>
+                <b-input-group prepend="Elhost">
+                  <b-form-input type="text" v-model="editingItem.elhost"></b-form-input>
+                </b-input-group>
+              </b-col>
+          </b-row>
+          <b-row>
+              <b-col>
+                <b-input-group prepend="Elport">
+                  <b-form-input type="text" v-model="editingItem.elport"></b-form-input>
+                </b-input-group>
+              </b-col>
+          </b-row>
+          <b-row>
+              <b-col>
+                <b-input-group prepend="Datepat">
+                  <b-form-select v-model="editingItem.datepat" :options="datepatoptions"/>
+                </b-input-group>
+              </b-col>
+          </b-row>
+          <b-row>
+              <b-col>
+                <b-input-group prepend="Index">
+                  <b-form-input type="text" v-model="editingItem.index"></b-form-input>
+                </b-input-group>
+              </b-col>
+          </b-row>
+          <b-row>
+              <b-col>
+                <b-input-group prepend="Comparemode">
+                  <b-form-select v-model="editingItem.compareMode" :options="compareModeoptions"/>
+                </b-input-group>
+              </b-col>
+          </b-row>
+          <b-row>
+              <b-col>
+                <b-input-group prepend="Threshold">
+                  <b-form-input type="text" v-model="editingItem.threshold"></b-form-input>
+                </b-input-group>
+              </b-col>
+          </b-row>
+          <b-row>
+              <b-col>
+                <b-input-group prepend="OP">
+                  <b-form-select v-model="editingItem.op" :options="opoptions"/>
+                </b-input-group>
+              </b-col>
+          </b-row>
+          <b-row>
+              <b-col>
+                <b-input-group prepend="Postcontent">
+                  <b-form-textarea :rows="6" v-model="postContent"></b-form-textarea>
+                </b-input-group>
+              </b-col>
+          </b-row>
+          <b-row>
+              <b-col>
+                <b-input-group prepend="Sendmail">
+                  <b-form-select v-model="editingItem.sendMail" :options="booloptions"/>
+                </b-input-group>
+              </b-col>
+          </b-row>
+          <template v-if="editingItem.sendMail">
+            <b-row>
+                <b-col>
+                  <b-input-group prepend="Mailservice">
+                    <b-form-input type="text" v-model="editingItem.mailService"></b-form-input>
+                  </b-input-group>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col>
+                  <b-input-group prepend="Mailuser">
+                    <b-form-input type="text" v-model="editingItem.mailUser"></b-form-input>
+                  </b-input-group>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col>
+                  <b-input-group prepend="Mailpass">
+                    <b-form-input type="text" v-model="editingItem.mailPass"></b-form-input>
+                  </b-input-group>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col>
+                  <b-input-group prepend="Mailto">
+                    <b-form-input type="text" v-model="editingItem.mailTo"></b-form-input>
+                  </b-input-group>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col>
+                  <b-input-group prepend="Mailtemplate">
+                    <b-form-select v-model="editingItem.mailbody" :options="mailbodyoptions"/>
+                  </b-input-group>
+                </b-col>
+            </b-row>
+            <b-row>
+                <template v-for="(interest, index) in editingItem.interestedField">
+                <b-col sm="12">
+                  <b-input-group prepend="Interested Field">
+                    <b-form-input type="text" v-model="editingItem.interestedField[index]"></b-form-input>
+                    <b-button-group slot="append">
+                      <b-button size="sm" 
+                              @click="editingItem.interestedField.splice(index, 1)">-</b-button>
+                      <b-button size="sm" 
+                              v-show="isLastItem(editingItem.interestedField, index)"
+                              @click="editingItem.interestedField.push('')"
+                              >+</b-button>
+                    </b-button-group>
+                  </b-input-group>
+                </b-col>
+                </template>
+            </b-row>
+            <b-row>
+                <b-col>
+                  <b-input-group prepend="Mailsubject">
+                    <b-form-input type="text" v-model="editingItem.mailSubject"></b-form-input>
+                  </b-input-group>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col>
+                  <b-input-group prepend="Ref Link">
+                    <b-form-input type="text" v-model="editingItem.referenceLink"></b-form-input>
+                  </b-input-group>
+                </b-col>
+            </b-row>
+            <b-row>
+                <b-col>
+                  <b-input-group prepend="Mail Body">
+                    <b-form-textarea :rows="6" v-model="editingItem.extraMailBody"></b-form-textarea>
+                  </b-input-group>
+                </b-col>
+            </b-row>
+          </template>
+					<div slot="modal-footer" class="w-100">
+            <b-btn size="sm" class="float-right mr-2" variant="primary" @click="save(editingItem); $refs.editModal.hide()">Save</b-btn>
+				    <b-btn size="sm" class="float-right mr-2" @click="$refs.editModal.hide()">Cancel </b-btn>
+          </div>
+        </b-modal>
+				<!--
+        <b-col>
           <b-row>
               <b-col>
                 <b-input-group prepend="Name">
@@ -227,6 +388,7 @@
                 </b-col>
             </b-row>
 				</b-col>
+				-->
       </b-row>
     </b-container>
   </div>
@@ -266,8 +428,8 @@ export default {
         'edit_item',
         'run_test',
         'ismet',
+        'recurrence',
         'timer',
-        'period',
 				'view'
       ],
       postContent: "",
@@ -277,15 +439,14 @@ export default {
       },
       testResult: "",
       pseudoStat: [],
-      configstatus: {
-        "isediting": false,
-        "isrunning": false,
-        "timer": 0,
-        "runTimer": 0,
-        "period": 0,
-        "ismet": false,
-        "passtest": false
-      },
+      //configstatus: {
+      //  "isediting": false,
+      //  "isrunning": false,
+      //  "timer": 0,
+      //  "runTimer": 0,
+      //  "ismet": false,
+      //  "passtest": false
+      //},
       mailbodyoptions: []
     }
   },
@@ -322,9 +483,9 @@ export default {
           //TABLE WILL COMPLAIN UNDEFINED, SO WE DEFINED FIRST
           this.pseudoStat = res.data.map(config => {
             var obj = {}
-            obj.runTimer = config.status.runTimer
-            obj.period   = config.status.period
-            obj.ismet    = config.status.ismet
+            obj.runTimer   = config.status.runTimer
+            obj.ismet      = config.status.ismet
+            obj.recurrence = config.status.recurrence
             return obj
           })
 
@@ -354,7 +515,7 @@ export default {
         //})
       }
     },
-    save(item, index, button) {
+    save(item) {
       var self = this
       if (!this.isValid(item)) {
         this.showAlert({ variant: "danger", text: "config not valid!" })
@@ -373,23 +534,24 @@ export default {
         })
       }
     },
-    add() {
-      var self = this,
-          item = this.editingItem
+		// manually add is USELESS, user just copy one and edit them
+    //add() {
+    //  var self = this,
+    //      item = this.editingItem
 
-      item.postContent = JSON.parse(this.postContent)
-      //MANUALLY ADD CONFIG DOESNT STATUS, WE HAVE TO BUILD THEM
-      item.status = this.configstatus
-      
-      axios.post(backendUrl + '/addconf', {
-        item: item,
-      }).then(res => {
-        self.editingItem = {}
-        self.postContent = ""
-        self.originItemName = ""
-        self.$socket.emit("changeconfig", "add");
-      })
-    },
+    //  item.postContent = JSON.parse(this.postContent)
+    //  //MANUALLY ADD CONFIG DOESNT STATUS, WE HAVE TO BUILD THEM
+    //  item.status = this.configstatus
+    //  
+    //  axios.post(backendUrl + '/addconf', {
+    //    item: item,
+    //  }).then(res => {
+    //    self.editingItem = {}
+    //    self.postContent = ""
+    //    self.originItemName = ""
+    //    self.$socket.emit("changeconfig", "add");
+    //  })
+    //},
     copy(item, index, button) {
       var self = this
       if (item.status.isrunning) {
@@ -406,7 +568,9 @@ export default {
       var self = this
       if (item.status.isrunning) {
         this.showAlert({variant: "danger", text: "Please stop cron first"})
-      } else {
+			} else if (this.allconfigs.length == 1) {
+        this.showAlert({variant: "danger", text: "At least one config should stay"})
+			} else{
         axios.post(backendUrl + '/removeconf', {
           item: item
         }).then(res => {
@@ -600,9 +764,9 @@ export default {
       // this.allconfigs = allconfigs
       this.pseudoStat = allconfigs.map((config, i) => {
         var obj = {}
-        obj.runTimer = config.status.runTimer
-        obj.period   = config.status.period
-        obj.ismet    = config.status.ismet
+        obj.runTimer   = config.status.runTimer
+        obj.ismet      = config.status.ismet
+        obj.recurrence = config.status.recurrence
 
         //MAKE CELL VARIANTS AFTER GETTING STAT
         this.allconfigs[i]._cellVariants = {}
