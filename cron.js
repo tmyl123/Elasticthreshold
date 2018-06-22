@@ -62,7 +62,7 @@ function cronStart(config) {
 			config.status.recurrence = recurrence
 
 
-	    console.log(cronname, taskFarm[cronname].runTimer, taskFarm[config.name].ismet, recurrence)
+//	    console.log(cronname, taskFarm[cronname].runTimer, taskFarm[config.name].ismet, recurrence)
 
 			fs.writeFileSync(configFileName, JSON.stringify(config, undefined, 2))
 		}

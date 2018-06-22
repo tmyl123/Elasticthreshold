@@ -1,4 +1,5 @@
-var http           = require('http'),
+var appconfig      = require('./config/ethold.env.js'),
+    http           = require('http'),
     express        = require('express'),
     app            = express(),
     server         = http.createServer(app),
@@ -26,8 +27,8 @@ app.use(function(req, res, next) {
 
 
 //SERVER LISTEN
-server.listen(3000, function() {
-    console.log("Node listen on port 3000");
+server.listen(appconfig.backendPort, function() {
+    console.log("Node listen on port " + appconfig.backendPort);
 });
 
 
