@@ -1,4 +1,4 @@
-var appconfig      = require('./config/ethold.env.js'),
+var appconfig      = require('./ethold.env.js'),
     http           = require('http'),
     express        = require('express'),
     app            = express(),

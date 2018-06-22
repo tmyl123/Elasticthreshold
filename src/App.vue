@@ -239,7 +239,7 @@ import Vue from 'vue'
 import BootstrapVue from 'bootstrap-vue'
 Vue.use(BootstrapVue);
 
-var appconfig      = require('../config/ethold.env.js')
+var appconfig      = require('../ethold.env.js')
 var backendUrl     = appconfig.backendUrl || "http://" + window.location.hostname + ":" + appconfig.backendPort
 
 import VueSocketio from 'vue-socket.io';

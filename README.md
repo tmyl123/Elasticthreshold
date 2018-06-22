@@ -20,7 +20,7 @@ A gui interface to setup alert for elasticsearch data.
 
 `cp config_example.json configs` 
 
-`mv ethold.env.js config/`
+`cp ethold.env.default.js ethold.env.js`
 
 <br>
 
