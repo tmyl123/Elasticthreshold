@@ -18,54 +18,57 @@
     </b-container>
    <b-container fluid class="bv-example-row">
       <b-row>
-        <b-col sm="8">
-          <b-table 
-            striped 
-            hover 
-            :items="allconfigs"
-            :fields="tablefields"
-            >
-          <template slot="cron" slot-scope="row">
-            <b-button-group>
-              <b-button size="sm" variant="success" v-show="!row.item.status.isrunning" @click.stop="toggleStat(row.item, row.index, $event.target)" class="mr-2">Start</b-button>
-              <b-button size="sm" variant="danger" v-show="row.item.status.isrunning" @click.stop="toggleStat(row.item, row.index, $event.target)" class="mr-2">Stop</b-button>
-            </b-button-group>
-          </template>
-          <template slot="edit_item" slot-scope="row">
-            <b-button-group>
-              <b-button size="sm" variant="primary" v-show="!row.item.status.isediting" @click.stop="edit(row.item, row.index, $event.target)" class="mr-2">edit</b-button>
-              <b-button size="sm" variant="primary" v-show="row.item.status.isediting" @click.stop="save(row.item, row.index, $event.target)" class="mr-2">save</b-button>
-              <b-button size="sm" variant="primary" @click.stop="copy(row.item, row.index, $event.target)" class="mr-2">copy</b-button>
-              <b-button size="sm" variant="danger" @click.stop="remove(row.item, row.index, $event.target)" class="mr-2">remove</b-button>
-            </b-button-group>
-          </template>
-          <template slot="run_test" slot-scope="row">
-            <b-button-group>
-              <b-button size="sm" variant="info" @click.stop="test(row.item, row.index, $event.target)" class="mr-2">test</b-button>
-            </b-button-group>
-          </template>
-          <template slot="ismet" slot-scope="row">
-            {{ pseudoStat[row.index].ismet }}
-          </template>
-          <template slot="timer" slot-scope="row">
-            <!--        {{ allconfigs[row.index].status.runTimer }}-->
-            {{ pseudoStat[row.index].runTimer }}
-          </template>
-          <template slot="period" slot-scope="row">
-            <!--        {{ allconfigs[row.index].status.period }}-->
-            {{ pseudoStat[row.index].period }}
-          </template>
-          <template slot="view" slot-scope="row">
-						<b-btn :id="'config' + row.index">?</b-btn>
-						<b-tooltip 
-							:target="'config' + row.index" 
-							:title="itemtooltips(row.item)"
-							placement="right"
-							></b-tooltip>
-          </template>
-          </b-table>
-        </b-col>
-        <b-col sm="4">
+        <b-table 
+          striped 
+          hover 
+          :items="allconfigs"
+          :fields="tablefields"
+          >
+        <template slot="cron" slot-scope="row">
+          <b-button-group>
+            <b-button size="sm" variant="success" v-show="!row.item.status.isrunning" @click.stop="toggleStat(row.item, row.index, $event.target)" class="mr-2">Start</b-button>
+            <b-button size="sm" variant="danger" v-show="row.item.status.isrunning" @click.stop="toggleStat(row.item, row.index, $event.target)" class="mr-2">Stop</b-button>
+          </b-button-group>
+        </template>
+        <template slot="edit_item" slot-scope="row">
+          <b-button-group>
+            <b-button size="sm" variant="primary" v-show="!row.item.status.isediting" @click.stop="edit(row.item, row.index, $event.target)" class="mr-2">edit</b-button>
+            <b-button size="sm" variant="primary" v-show="row.item.status.isediting" @click.stop="save(row.item, row.index, $event.target)" class="mr-2">save</b-button>
+            <b-button size="sm" variant="primary" @click.stop="copy(row.item, row.index, $event.target)" class="mr-2">copy</b-button>
+            <b-button size="sm" variant="danger" @click.stop="remove(row.item, row.index, $event.target)" class="mr-2">remove</b-button>
+          </b-button-group>
+        </template>
+        <template slot="run_test" slot-scope="row">
+          <b-button-group>
+            <b-button size="sm" variant="info" @click.stop="test(row.item, row.index, $event.target)" class="mr-2">test</b-button>
+          </b-button-group>
+        </template>
+        <template slot="ismet" slot-scope="row">
+          {{ pseudoStat[row.index].ismet }}
+        </template>
+        <template slot="timer" slot-scope="row">
+          <!--        {{ allconfigs[row.index].status.runTimer }}-->
+          {{ pseudoStat[row.index].runTimer }}
+        </template>
+        <template slot="period" slot-scope="row">
+          <!--        {{ allconfigs[row.index].status.period }}-->
+          {{ pseudoStat[row.index].period }}
+        </template>
+        <template slot="view" slot-scope="row">
+					<b-btn :id="'config' + row.index">?</b-btn>
+					<b-tooltip 
+						:target="'config' + row.index" 
+						:title="itemtooltips(row.item)"
+						placement="right"
+						></b-tooltip>
+        </template>
+        </b-table>
+      </b-row>
+			<b-row>
+        <b-col>
+          <pre v-html="testResult"></pre>
+				</b-col>
+        <b-col cols="5">
           <b-row>
               <b-col>
                 <b-input-group prepend="Name">
@@ -130,23 +133,6 @@
               </b-col>
           </b-row>
           <b-row>
-              <template v-for="(interest, index) in editingItem.interestedField">
-              <b-col sm="12">
-                <b-input-group prepend="Interested Field">
-                  <b-form-input type="text" v-model="editingItem.interestedField[index]"></b-form-input>
-                  <b-button-group slot="append">
-                    <b-button size="sm" 
-                            @click="editingItem.interestedField.splice(index, 1)">-</b-button>
-                    <b-button size="sm" 
-                            v-show="isLastItem(editingItem.interestedField, index)"
-                            @click="editingItem.interestedField.push('')"
-                            >+</b-button>
-                  </b-button-group>
-                </b-input-group>
-              </b-col>
-              </template>
-          </b-row>
-          <b-row>
               <b-col>
                 <b-input-group prepend="Postcontent">
                   <b-form-textarea :rows="6" v-model="postContent"></b-form-textarea>
@@ -197,6 +183,23 @@
                 </b-col>
             </b-row>
             <b-row>
+                <template v-for="(interest, index) in editingItem.interestedField">
+                <b-col sm="12">
+                  <b-input-group prepend="Interested Field">
+                    <b-form-input type="text" v-model="editingItem.interestedField[index]"></b-form-input>
+                    <b-button-group slot="append">
+                      <b-button size="sm" 
+                              @click="editingItem.interestedField.splice(index, 1)">-</b-button>
+                      <b-button size="sm" 
+                              v-show="isLastItem(editingItem.interestedField, index)"
+                              @click="editingItem.interestedField.push('')"
+                              >+</b-button>
+                    </b-button-group>
+                  </b-input-group>
+                </b-col>
+                </template>
+            </b-row>
+            <b-row>
                 <b-col>
                   <b-input-group prepend="Mailsubject">
                     <b-form-input type="text" v-model="editingItem.mailSubject"></b-form-input>
@@ -223,10 +226,7 @@
                   <b-button variant="success" @click="add" class="mr-2">ADD</b-button>
                 </b-col>
             </b-row>
-        </b-col>
-      </b-row>
-      <b-row>
-        <pre v-html="testResult"></pre>
+				</b-col>
       </b-row>
     </b-container>
   </div>
@@ -622,5 +622,13 @@ export default {
 <style>
   .header-row {
     height: 80px;
+  }
+	.tooltip-inner {
+    max-width: 400px;
+    padding: 0.25rem 0.5rem;
+    color: #fff;
+    text-align: left;
+    background-color: #000;
+    border-radius: 0.25rem;
   }
 </style>

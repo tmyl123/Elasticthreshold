@@ -14,9 +14,7 @@ var sendMailAction  = require('./lib/sendmail').sendMailAction,
     parseTimeframe  = require('./lib/parsetimeframe').parseTimeframe,
     parseThreshold  = require('./lib/parsethreshold').parseThreshold,
     parseDatepat    = require('./lib/parsedatepattern.js').parseDatepat,
-    operators       = require('./lib/operators.js').operators,
-    findPropPath    = require('./lib/objutils.js').findPropPath,
-    useObjPath      = require('./lib/objutils.js').useObjPath
+    operators       = require('./lib/operators.js').operators
 
 
 
@@ -34,8 +32,7 @@ function ethold(config, callback) {
       threshold       =  config.threshold,
       op              =  config.op,
       comparemode     =  config.compareMode,
-      onlymet         =  config.onlyMet,
-      sendmail        =  config.sendMail
+      sendmail        =  config.sendMail,
       interestedfield =  config.interestedField
   
   if (config.datepat) {
@@ -102,6 +99,11 @@ function ethold(config, callback) {
       }
   
     } else if (comparemode == "agg") {
+
+			if (!body.aggregations) {
+				callback("query is not aggregation search!")
+			  return
+			}
   
       var obj = body.aggregations
       var hitscount = Object.values(obj)[0]["buckets"].length
@@ -134,14 +136,11 @@ function ethold(config, callback) {
       if (sendmail) {
         sendMailAction(config, sumobj)
       }
-    } else {
-      if (onlymet) {
-        process.exit()
-      }
     }
 
     infoObj.summary = sumobj
   
+		console.log(JSON.stringify(infoObj))
     callback(infoObj)
   })
 }

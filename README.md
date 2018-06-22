@@ -1,15 +1,15 @@
-# elasticthreshold
+# ethold
 
 ### Description
-This tool is make for querying threshold in elasticsearch. It may not be the most easy to use tool, but elastic enough.
-although we have Elastalert, but AFAIK they don't provide derivative aggregation query, which we use them a lot.
+A gui interface to setup alert for elasticsearch data.
+
 
 <br>
 
 ### Download
-`git clone https://github.com/tmyl123/Elasticthreshold.git`
+`git clone https://github.com/tmyl123/ethold.git`
 
-`cd Elasticthreshold`
+`cd ethold`
 
 `npm install`
 
