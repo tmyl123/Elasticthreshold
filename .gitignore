@@ -2,6 +2,7 @@
 node_modules/
 dist/
 configs/
+config/ethold.env.js
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

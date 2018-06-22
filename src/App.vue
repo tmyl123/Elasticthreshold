@@ -191,6 +191,7 @@
                     <b-form-input type="text" v-model="editingItem.interestedField[index]"></b-form-input>
                     <b-button-group slot="append">
                       <b-button size="sm" 
+                              v-show="!isOnlyItem(editingItem.interestedField)"
                               @click="editingItem.interestedField.splice(index, 1)">-</b-button>
                       <b-button size="sm" 
                               v-show="isLastItem(editingItem.interestedField, index)"
@@ -490,6 +491,13 @@ export default {
     //},
     isLastItem(array, index) {
       if (index == (array.length - 1)) {
+        return true
+      } else {
+        return false
+      }
+    },
+    isOnlyItem(array) {
+      if (array.length == 1) {
         return true
       } else {
         return false
