@@ -27,10 +27,10 @@ A gui interface to setup alert for elasticsearch data.
 ### Usage
 
 * FOR DEV
-`npm run dev`  &&  `node app.js`  and open browser at `localhost:8080`
+`npm run dev`  &&  `node ethold-front.js`  and open browser at `localhost:8080`
 
 * FOR PROD
-`npm run build` && `pm2 start app.js` and open browser at `localhost:3000`
+`npm run build` && `pm2 start ethold-front.js` and open browser at `localhost:3000`
 
 <br>
 
