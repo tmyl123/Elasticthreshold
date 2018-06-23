@@ -21,60 +21,87 @@ function cronInit() {
   });
 }
 
+var intervalSec = 60
 
 //START CRON
 function cronStart(config) {
 		console.log("CRON START")
-	var interval = config.interval * 60 * 1000,
+	var interval = config.interval * intervalSec * 1000,
 		  runTimer = interval / 1000
+
+	const configFileName = './configs/' + config.name  +'.json'
+	const configFile = JSON.parse(fs.readFileSync(configFileName))
 				
-	var ismet      = config.status.ismet || false ,
-	    recurrence = config.status.recurrence || 0
   
   taskFarm[config.name] = setInterval(function() {
+
+	taskFarm[config.name].ismet      = configFile.status.ismet || false
+	taskFarm[config.name].recurrence = configFile.status.recurrence || 0
+
 
 		runTimer --
 		if (runTimer == 0) {
 		  ethold(config, function(queryRes) {
-//	      console.log(queryRes)
+//	    console.log(queryRes)
 
 			  runTimer = interval / 1000
 
-				if (ismet !== queryRes.summary.ismet) {
-				  recurrence = 0
+				if (taskFarm[config.name].ismet !== queryRes.summary.ismet) {
+					console.log("not same")
+				  taskFarm[config.name].recurrence = 0
 				} else {
-					recurrence ++
+					console.log("same")
+					taskFarm[config.name].recurrence += 1
 				}
 
-		    taskFarm[config.name].ismet    = queryRes.summary.ismet
+		    taskFarm[config.name].ismet  = queryRes.summary.ismet
+		    configFile.status.ismet      = taskFarm[config.name].ismet
+     	  configFile.status.recurrence = taskFarm[config.name].recurrence
 
 	    })
 		}
 
 		taskFarm[config.name].runTimer = runTimer
 
+    configFile.status.runTimer   = taskFarm[config.name].runTimer
+     
+
     //WRITE STAT INTO CONFIG.STATUS
-		for (var cronname in taskFarm) {
-			const configFileName = './configs/' + cronname  +'.json'
-		  const config = JSON.parse(fs.readFileSync(configFileName))
+			fs.writeFileSync(configFileName, JSON.stringify(configFile, undefined, 2))
 
-			config.status.runTimer   = taskFarm[cronname].runTimer
-			config.status.ismet      = taskFarm[config.name].ismet
-
-			config.status.recurrence = recurrence
-
-
-//	    console.log(cronname, taskFarm[cronname].runTimer, taskFarm[config.name].ismet, recurrence)
-
-			fs.writeFileSync(configFileName, JSON.stringify(config, undefined, 2))
-		}
+	
   }, 1000)
 }
+
+// PRINT ALL CRON, DEBUG ONLY
+//setInterval(function(){
+//  for (var cronname in taskFarm) {
+//    console.log(
+//  					cronname, 
+//  					taskFarm[cronname].runTimer, 
+//  					taskFarm[cronname].ismet, 
+//  					taskFarm[cronname].recurrence
+//  	)
+//  }
+//},1000)
+
+
 
 
 //STOP CRON
 function cronStop(config) {
 		console.log("CRON STOP")
+
+	const configFileName = './configs/' + config.name  +'.json'
+	const configFile = JSON.parse(fs.readFileSync(configFileName))
+
+	configFile.status.ismet      = taskFarm[config.name].ismet
+  configFile.status.recurrence = taskFarm[config.name].recurrence
+
+  configFile.status.runTimer   = 0
+
+	fs.writeFileSync(configFileName, JSON.stringify(configFile, undefined, 2))
+
   clearInterval(taskFarm[config.name])
   delete taskFarm[config.name]
 }
