@@ -45,11 +45,13 @@ function cronStart(config) {
 				} else {
 					recurrence ++
 				}
+
+		    taskFarm[config.name].ismet    = queryRes.summary.ismet
+
 	    })
 		}
 
 		taskFarm[config.name].runTimer = runTimer
-		taskFarm[config.name].ismet    = ismet
 
     //WRITE STAT INTO CONFIG.STATUS
 		for (var cronname in taskFarm) {
