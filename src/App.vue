@@ -638,12 +638,8 @@ export default {
   .header-row {
     height: 80px;
   }
-	.tooltip-inner {
-    max-width: 400px;
-    padding: 0.25rem 0.5rem;
-    color: #fff;
-    text-align: left;
-    background-color: #000;
-    border-radius: 0.25rem;
+  .tooltip-inner {
+    max-width: 400px !important;
+    text-align: left !important;
   }
 </style>
