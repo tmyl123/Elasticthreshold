@@ -10,6 +10,7 @@ var request = require('request'),
 
 
 var sendMailAction  = require('./lib/sendmail').sendMailAction,
+    webHookAction  = require('./lib/webhook').webHookAction,
     changeUnit      = require('./lib/changeunit').changeUnit,
     parseTimeframe  = require('./lib/parsetimeframe').parseTimeframe,
     parseThreshold  = require('./lib/parsethreshold').parseThreshold,
@@ -33,6 +34,7 @@ function ethold(config, callback) {
       op              =  config.op,
       comparemode     =  config.compareMode,
       sendmail        =  config.sendMail,
+      webhook         =  config.webHook,
       interestedfield =  config.interestedField
   
   if (config.datepat) {
@@ -136,11 +138,14 @@ function ethold(config, callback) {
       if (sendmail) {
         sendMailAction(config, sumobj)
       }
+      if (webhook) {
+        webHookAction(config, sumobj)
+      }
     }
 
     infoObj.summary = sumobj
   
-		console.log(JSON.stringify(infoObj))
+    console.log(JSON.stringify(infoObj))
     callback(infoObj)
   })
 }
